@@ -107,8 +107,11 @@ write.csv(result_output, file="2A_permanova_each_ref.csv")
     mm <- metaMDS((dataExp), k=k, distance="bray", trymax=100, autotransform=F, noshare=F, wascores=T)
     stress[k] <- mm$stress
   }
-  plot(stress)
-
+  formatC(stress)
+  png("2A_stress_values.png")
+  plot(stress, xlab="Dimension", main="MDS Stress values for 2A")
+  dev.off()
+  
   k <- 2
 
 tiff("2A_Site.tiff", res=300, width=2000, height=2000)
