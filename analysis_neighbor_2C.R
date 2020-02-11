@@ -111,6 +111,11 @@ for(k in 1:10){
   stress[k] <- mm$stress
 }
 plot(stress)
+formatC(stress)
+png("2C_stress_values.png")
+plot(stress, xlab="Dimension", main="NMDS Stress values for 2C")
+dev.off()
+
 
 k <- 2
 

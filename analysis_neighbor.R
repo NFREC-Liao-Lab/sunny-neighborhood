@@ -109,7 +109,7 @@ write.csv(result_output, file="2A_permanova_each_ref.csv")
   }
   formatC(stress)
   png("2A_stress_values.png")
-  plot(stress, xlab="Dimension", main="MDS Stress values for 2A")
+  plot(stress, xlab="Dimension", main="NMDS Stress values for 2A")
   dev.off()
   
   k <- 2
