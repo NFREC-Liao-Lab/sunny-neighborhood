@@ -1,10 +1,17 @@
-# taxa_name$group <- gsub("Endophye", "endophyte", taxa_name$group)
+# Hui-Ling Liao et. al. Heterospecific neighbor plants impact root microbiome diversity and molecular function of root fungi
+# Figure 4c, 4d
+# Table S3
+
 library(readxl)
 library(vegan)
 library(RColorBrewer)
 library(gplots)
 
+# Sheet 2C. Dataset 3C. Relative aboundance of bacterial taxa for an individual root sample.
+# The numbers indicate the percent for the ratio of the 16S reads that were blasted to a bacterial taxa to the total 16S reads extracted from an individual root sample.
+# Only the data that >0.5% reads in at least on sample were renormalized to 100% and shown.
 
+# taxa_name$group <- gsub("Endophye", "endophyte", taxa_name$group)
 # librdata_header <- read.csv("Neighbor_Dataset_2C.csv", nrow=1)
 # data <- read.csv("Neighbor_Dataset_2C.csv", skip=1)
 data_header <- data.frame(read_excel("Neighbor_Dataset_2A&B.xlsx", n_max=2, col_names=F, skip=1, sheet="2C"))
@@ -25,40 +32,18 @@ taxa_name$group <- factor(taxa_name$group)
 # taxa_name2 <- apply(taxa_name, 1, function(x){paste(x, collapse="_")})
 
 h2 <- data_header[2,]
-# h2 <- gsub("P. taeda", "Taead", h2)
 h2 <- gsub("Ptri", "P\\. tri", h2)
 h2 <- na.omit(h2)
 
 data2 <- data[,-(1:3)]
 colnames(data2) <- h2
-# rownames(data) <- group_name2
 data[is.na(data)]<- 0
 
 dataExp <- t(apply(data2, 2, function(x){x/sum(x, na.rm=T)}))
 apply(dataExp,1,sum, na.rm=T)
 site <- data.frame(ID=gsub("Sum of(.+)_\\%read", "\\1", data_header[1,-(1:3)]), label=factor(rownames(dataExp)))
 
-
 cPal8 <- brewer.pal(8, "Dark2")
-
-
-# site <- rep(c("A","B"), each=4)
-
-# dataTrt <- data.frame(site=site, rep=paste0(site, 1:4))
-# cPal8 <- brewer.pal(8, "Dark2")
-
-# for(sheet in sheets){
-#   pdf(sprintf("overallResult_%s.pdf", sheet), width=8, height=8)
-#   data <- data.frame(read_xlsx("V10_Fig3_statistics.xlsx", skip=1, sheet=sheet))
-#   names(data) <- gsub("ecological.function", "group", names(data))
-#   summary(data)
-#   data[["group"]] <- gsub("Sap .+", "Sap", data[["group"]])
-#   data[["group"]] <- gsub("pathogen", "Pathogen", data[["group"]])
-#   data[["group"]] <- gsub("Ecto-,.+", "Ecto", data[["group"]])
-#   data[["group"]] <- factor(data[["group"]])
-#
-#   dataExp <- t(data[, grep("[A|B][1-4]", names(data), value=T)])
-#   colnames(dataExp) <- data$ref
 
 
 all_labels <- levels(site$label)
@@ -103,8 +88,6 @@ pdf("2C_permanova_all_sites.pdf")
 textplot(capture.output(result))
 dev.off()
 
-mm <- metaMDS((dataExp), k=2, distance="euclidean", trymax=100, autotransform=F, noshare=F, wascores=T)
-
 stress <- vector()
 for(k in 1:10){
   mm <- metaMDS((dataExp), k=k, distance="bray", trymax=100, autotransform=F, noshare=F, wascores=T)
@@ -118,8 +101,7 @@ dev.off()
 
 
 k <- 2
-
-png("2C_Site.png", res=300, width=2000, height=2000)
+# png("2C_Site.png", res=300, width=2000, height=2000)
 tiff("2C_Site.tiff", res=300, width=2000, height=2000)
 
 cPalSet1 <- brewer.pal(8, "Set1")
@@ -132,33 +114,23 @@ customColour[customColour==4] <- cPalSet1[1]
 mm <- metaMDS((dataExp), k=k, distance="bray", trymax=100, autotransform=F, noshare=F, wascores=T)
 choice <- c(1, 2)
 plot(mm, type="n", display = "sites", cex=2, choice=choice, xlim=c(-1.2, 0.9))
-  # main=sprintf("%s   p-value:%.3f", "", result$aov.tab[["Pr(>F)"]][1]), )
-# text(mm, display="sites", labels = site$ID, col=cPal8[as.numeric(site$label)], choice=choice )
-# points(mm, col=cPal8[as.numeric(site$label)], cex=1.2)
 points(mm, pch=as.numeric(site$label)-1, cex=1.2, col=customColour)
 with(site, ordiellipse(mm, label, scaling = "symmetric", kind = "ehull", col = cPalSet1[4:1], lwd=2, label=T))
 legend("bottomleft", legend=levels(site$label), pch=1:nlevels(site$label)-1, bty="n", col=cPalSet1[4:1])
 
 dev.off()
 
-# png("2C_Site_BW.png", res=300, width=2000, height=2000)
-tiff("2C_Site_BW.tiff", res=300, width=2000, height=2000)
 
+tiff("2C_Site_BW.tiff", res=300, width=2000, height=2000)
 plot(mm, type="n", display = "sites", cex=2, choice=choice, xlim=c(-1.2, 0.9))
 points(mm, pch=as.numeric(site$label)-1, cex=1.2)
 with(site, ordiellipse(mm, label, scaling = "symmetric", kind = "ehull", col = cPalSet1[4:1], lwd=2, label=T))
 legend("bottomleft", legend=levels(site$label), pch=1:nlevels(site$label)-1, bty="n")
 dev.off()
 
-  # plot(mm, type="p", display = "sites", cex=2, choice=c(2,3),
-  #   main=sprintf("%s   p-value:%.3f", "", result$aov.tab[["Pr(>F)"]][1]))
-  # text(mm, display="sites", labels = site$ID, col=cPal8[as.numeric(site$label)], choice=c(2,3) )
-  # with(site, ordiellipse(mm, label, scaling = "symmetric", kind = "ehull", col = cPal8[1:nlevels(label)], lwd=3, label=T, choice=c(2,3)))
 
 
-
-
-png("2C_Species.png", res=300, width=2000, height=2000)
+# png("2C_Species.png", res=300, width=2000, height=2000)
 tiff("2C_Species.tiff", res=300, width=2000, height=2000)
 # dev.off()
 # png("2C_Species.png", width=600, height=600)
@@ -173,14 +145,3 @@ legend("bottomleft", legend=new_legend, fill=cPal8[1:nlevels(taxa_name$group)], 
 dev.off()
 
 write.csv(taxa_name, file="2C_taxa.csv")
-
-  # , col=cPal8[as.numeric(group)], cex=0.7))
-  # with(dataExp, text(mm, display="species", labels = as.character(ref), col=cPal8[as.numeric(group)], cex=0.7))
-  # #
-  # # dev.off()
-  #
-}
-
-# TODO: Analysis 2C
-# TODO: 2A. 44 by 7 (all + pairwise) PERANOVA p-value table.
-# TODO: 2A. by groups (EM, AM..etc) by 7

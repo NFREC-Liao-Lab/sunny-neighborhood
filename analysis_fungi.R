@@ -1,11 +1,20 @@
+# Hui-Ling Liao et. al. Heterospecific neighbor plants impact root microbiome diversity and molecular function of root fungi
+# Figure 4a, 4b
+# Table S2
+
 library(readxl)
 library(vegan)
 library(RColorBrewer)
 library(gplots)
 
+# Dataset 2A.
+# Relative aboundance of fungal taxa for an individual root sample.
+# The numbers indicate the percent for the ratio of the D1D2 reads that were blasted to an fungal taxa to the total D1D2 reads extracted from an individual root sample.
+# Only the data that >1% reads in at least on sample were shown.
 
-librdata_header <- read.csv("Neighbor_Dataset_2A.csv", nrow=1)
-data <- read.csv("Neighbor_Dataset_2A.csv", skip=1)
+
+# librdata_header <- read.csv("Neighbor_Dataset_2A.csv", nrow=1)
+# data <- read.csv("Neighbor_Dataset_2A.csv", skip=1)
 data_header <- data.frame(read_excel("Neighbor_Dataset_2A&B.xlsx", n_max=3, col_names=F, skip=1))
 data <- data.frame(read_excel("Neighbor_Dataset_2A&B.xlsx", col_names=F, skip=4))
 
@@ -36,24 +45,6 @@ site <- data.frame(ID=gsub("\\%read", "", data_header[1,-(1:3)]), label=factor(r
 
 cPal8 <- brewer.pal(8, "Dark2")
 
-
-# site <- rep(c("A","B"), each=4)
-
-# dataTrt <- data.frame(site=site, rep=paste0(site, 1:4))
-# cPal8 <- brewer.pal(8, "Dark2")
-
-# for(sheet in sheets){
-#   pdf(sprintf("overallResult_%s.pdf", sheet), width=8, height=8)
-#   data <- data.frame(read_xlsx("V10_Fig3_statistics.xlsx", skip=1, sheet=sheet))
-#   names(data) <- gsub("ecological.function", "group", names(data))
-#   summary(data)
-#   data[["group"]] <- gsub("Sap .+", "Sap", data[["group"]])
-#   data[["group"]] <- gsub("pathogen", "Pathogen", data[["group"]])
-#   data[["group"]] <- gsub("Ecto-,.+", "Ecto", data[["group"]])
-#   data[["group"]] <- factor(data[["group"]])
-#
-#   dataExp <- t(data[, grep("[A|B][1-4]", names(data), value=T)])
-#   colnames(dataExp) <- data$ref
 
 pdf("2A_permanova_each_sites.pdf")
 all_labels <- levels(site$label)
@@ -94,25 +85,24 @@ write.csv(result_output, file="2A_permanova_each_ref.csv")
 # }
 
 
-  abDist <- vegdist(dataExp, method="bray")
-  result <- adonis(abDist ~ site$label )#, data=site)
-  pdf("2A_permanova_all_sites.pdf")
-  textplot(capture.output(result))
-  dev.off()
+abDist <- vegdist(dataExp, method="bray")
+result <- adonis(abDist ~ site$label )#, data=site)
+pdf("2A_permanova_all_sites.pdf")
+textplot(capture.output(result))
+dev.off()
 
-  mm <- metaMDS((dataExp), k=2, distance="euclidean", trymax=100, autotransform=F, noshare=F, wascores=T)
 
-  stress <- vector()
-  for(k in 1:10){
-    mm <- metaMDS((dataExp), k=k, distance="bray", trymax=100, autotransform=F, noshare=F, wascores=T)
-    stress[k] <- mm$stress
-  }
-  formatC(stress)
-  png("2A_stress_values.png")
-  plot(stress, xlab="Dimension", main="NMDS Stress values for 2A")
-  dev.off()
-  
-  k <- 2
+stress <- vector()
+for(k in 1:10){
+  mm <- metaMDS((dataExp), k=k, distance="bray", trymax=100, autotransform=F, noshare=F, wascores=T)
+  stress[k] <- mm$stress
+}
+formatC(stress)
+png("2A_stress_values.png")
+plot(stress, xlab="Dimension", main="NMDS Stress values for 2A")
+dev.off()
+
+k <- 2
 
 tiff("2A_Site.tiff", res=300, width=2000, height=2000)
 
@@ -144,13 +134,7 @@ with(site, ordiellipse(mm, label, scaling = "symmetric", kind = "ehull", col = c
 legend("bottomleft", legend=levels(site$label), pch=1:nlevels(site$label)-1, bty="n")
 dev.off()
 
-  # plot(mm, type="p", display = "sites", cex=2, choice=c(2,3),
-  #   main=sprintf("%s   p-value:%.3f", "", result$aov.tab[["Pr(>F)"]][1]))
-  # text(mm, display="sites", labels = site$ID, col=cPal8[as.numeric(site$label)], choice=c(2,3) )
-  # with(site, ordiellipse(mm, label, scaling = "symmetric", kind = "ehull", col = cPal8[1:nlevels(label)], lwd=3, label=T, choice=c(2,3)))
 
-
-  #
 
 
 tiff("2A_Species.tiff", res=300, width=2000, height=2000)
@@ -167,14 +151,3 @@ legend("bottomleft", legend=new_legend, fill=cPal8[1:nlevels(taxa_name$group5)],
 dev.off()
 
 write.csv(taxa_name, file="2A_taxa.csv")
-
-  # , col=cPal8[as.numeric(group)], cex=0.7))
-  # with(dataExp, text(mm, display="species", labels = as.character(ref), col=cPal8[as.numeric(group)], cex=0.7))
-  # #
-  # # dev.off()
-  #
-}
-
-# TODO: Analysis 2C
-# TODO: 2A. 44 by 7 (all + pairwise) PERANOVA p-value table.
-# TODO: 2A. by groups (EM, AM..etc) by 7

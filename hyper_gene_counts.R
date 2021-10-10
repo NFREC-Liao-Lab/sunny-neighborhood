@@ -1,3 +1,7 @@
+# Hui-Ling Liao et. al. Heterospecific neighbor plants impact root microbiome diversity and molecular function of root fungi
+# Fisher's test. Figure 7b
+# Hypergeometric test. Table 1
+
 library(readxl)
 
 data_raw <- data.frame(read_xlsx("genes assign to taxa.xlsx", skip=2))
